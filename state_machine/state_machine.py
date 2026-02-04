@@ -54,7 +54,7 @@ class Search(StateBase):
 
                     elapsed = timestamp - self.gesture_start_time
 
-                    print(f"Open palm held for {elapsed} seconds")
+                    print(f"Open palm held for {round(elapsed,2)} seconds")
                     if elapsed >= self.GESTURE_HOLD_SECONDS:
                         id_to_track = hand.owner_id
 
@@ -90,13 +90,11 @@ class Track(StateBase):
 
         # If no target, start grace period timer
         if target is None:
-            print("Target lost this frame")
-            
             if ctx.target_lost_time is None:
                 ctx.target_lost_time = timestamp  # Start grace period timer
 
             elapsed = timestamp - ctx.target_lost_time
-            print(f"Target lost time is {elapsed} seconds")
+            print(f"Target lost for {round(elapsed,2)} seconds")
             if elapsed >= self.GRACE_PERIOD_SECONDS:
                 ctx.target_found = False
                 ctx.target_lost = True
@@ -158,7 +156,7 @@ class Track(StateBase):
                         print("Open palm detected while tracking, starting timer")
 
                     elapsed = timestamp - self.gesture_start_time
-                    print(f"Open palm held for {elapsed} seconds")
+                    print(f"Open palm held for {round(elapsed,2)} seconds")
                     if elapsed >= self.GESTURE_HOLD_SECONDS:
                         return True
             if not matched_this_frame:

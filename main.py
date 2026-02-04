@@ -16,7 +16,7 @@ def main():
     what_to_detect = "both"
 
     source = 0
-    #source = "example_videos/example2.mp4"
+    #source = "example_videos/example3.mp4"
 
     stream = VideoStream(source=source)
     saver = VideoSaver(resolution=stream.get_resolution())
