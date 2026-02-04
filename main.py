@@ -5,6 +5,7 @@ from detection.hand_detector import HandDetector
 from config.loader import load_detector_config
 from state_machine.context import Context
 from state_machine.state_machine import Search
+from visualization.video_saver import VideoSaver
 import visualization.write_on_frame
 import cv2
 
@@ -18,6 +19,7 @@ def main():
     #source = "example_videos/example2.mp4"
 
     stream = VideoStream(source=source)
+    saver = VideoSaver(resolution=stream.get_resolution())
     context = Context()
     pipeline = Pipeline(
         person_detector=(
@@ -60,6 +62,8 @@ def main():
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
 
+            saver.write_frame_to_video(frame)
+
             frame_id += 1
 
 
@@ -69,6 +73,7 @@ def main():
 
     finally:
         stream.release()
+        saver.release_video()
         cv2.destroyAllWindows()
         print("Released resources")
 
