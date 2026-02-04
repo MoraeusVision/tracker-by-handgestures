@@ -55,7 +55,7 @@ def main():
 
             state = state.update(context)
 
-            visualization.write_on_frame.visualize_all(frame, results)
+            visualization.write_on_frame.visualize_all(frame, results, context)
             cv2.imshow('Video stream', frame)
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
