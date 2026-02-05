@@ -1,3 +1,6 @@
+from core.data_types import PersonMemory
+from state_machine import utils
+
 class StateBase:
     def update(self, ctx):
         raise NotImplementedError
@@ -39,26 +42,10 @@ class Search(StateBase):
 
         return self
 
-    def decay_all_memories(self, ctx, timestamp, matched_ids):
-        for person_id, mem in ctx.person_memory.items():
-            if person_id in matched_ids:
-                continue
-
-            if mem.gesture_start_time is None:
-                continue
-
-            elapsed = timestamp - mem.gesture_start_time
-            elapsed_after_decay = elapsed - self.GESTURE_DECAY_SECONDS
-
-            if elapsed_after_decay <= 0.0:
-                mem.gesture_start_time = None
-                mem.gesture_elapsed_time = 0.0
-            else:
-                mem.gesture_start_time = timestamp - elapsed_after_decay
-                mem.gesture_elapsed_time = elapsed_after_decay
+    
 
     def start_search_algorithm(self, hands, timestamp, ctx):
-        from core.data_types import PersonMemory
+        
         matched_ids = set()
 
         if hands:
@@ -87,8 +74,12 @@ class Search(StateBase):
 
                         return True, id_to_track
             
-            
-        self.decay_all_memories(ctx, timestamp, matched_ids)
+        
+        utils.decay_all_memories(ctx=ctx,
+                                 timestamp=timestamp,
+                                 matched_ids=matched_ids,
+                                 gesture_decay_seconds=self.GESTURE_DECAY_SECONDS
+                                 )
 
         return False, None
     
@@ -153,26 +144,7 @@ class Track(StateBase):
 
         return self
 
-    def decay_all_memories(self, ctx, timestamp, matched_ids):
-        for person_id, mem in ctx.person_memory.items():
-            if person_id in matched_ids:
-                continue
-
-            if mem.gesture_start_time is None:
-                continue
-
-            elapsed = timestamp - mem.gesture_start_time
-            elapsed_after_decay = elapsed - self.GESTURE_DECAY_SECONDS
-
-            if elapsed_after_decay <= 0.0:
-                mem.gesture_start_time = None
-                mem.gesture_elapsed_time = 0.0
-            else:
-                mem.gesture_start_time = timestamp - elapsed_after_decay
-                mem.gesture_elapsed_time = elapsed_after_decay
-
     def search_for_gesture(self, ctx, timestamp):
-        from core.data_types import PersonMemory
         matched_ids = set()
         list_of_hands = ctx.perception["hands"]
         if list_of_hands:
@@ -200,7 +172,11 @@ class Track(StateBase):
                         ctx.reset_person_memory()
                         return True
                     
-        self.decay_all_memories(ctx, timestamp, matched_ids)   
+        utils.decay_all_memories(ctx=ctx,
+                                 timestamp=timestamp,
+                                 matched_ids=matched_ids,
+                                 gesture_decay_seconds=self.GESTURE_DECAY_SECONDS
+                                 )  
 
         return False
 
