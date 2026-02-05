@@ -12,21 +12,19 @@ class Search(StateBase):
         print("Searching...")
 
     def update(self, ctx):
-        frame_id = ctx.perception["frame_id"]
         timestamp = ctx.perception["timestamp"]
 
-        if frame_id % 3 == 0:
-            list_of_hands = ctx.perception["hands"]
-            tracking_triggered, id_to_track = self.start_search_algorithm(
-                list_of_hands, timestamp
-            )
-            if tracking_triggered:
-                print("Target found!")
-                ctx.target_found = True
-                ctx.id_to_track = id_to_track
-                ctx.cooldown = True  # Cooldown before looking for hands again
+        list_of_hands = ctx.perception["hands"]
+        tracking_triggered, id_to_track = self.start_search_algorithm(
+            list_of_hands, timestamp
+        )
+        if tracking_triggered:
+            print("Target found!")
+            ctx.target_found = True
+            ctx.id_to_track = id_to_track
+            ctx.cooldown = True  # Cooldown before looking for hands again
 
-                return Track()
+            return Track()
 
         return self
 
@@ -79,7 +77,6 @@ class Track(StateBase):
         self.cooldown_start_time = None
 
     def update(self, ctx):
-        frame_id = ctx.perception["frame_id"]
         timestamp = ctx.perception["timestamp"]
 
         id_to_track = ctx.id_to_track
@@ -117,8 +114,7 @@ class Track(StateBase):
 
         gesture_to_stop = False
         if not ctx.cooldown:
-            if frame_id % 3 == 0:
-                gesture_to_stop = self.search_for_gesture(ctx, timestamp)
+            gesture_to_stop = self.search_for_gesture(ctx, timestamp)
 
             if gesture_to_stop:
                 ctx.target_found = False

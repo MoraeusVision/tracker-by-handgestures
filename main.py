@@ -38,7 +38,6 @@ def main():
     try:
         state = Search()
         while True:
-            frame_id = 0
             frame, timestamp = stream.get_frame()
             if frame is None:
                 break
@@ -47,12 +46,11 @@ def main():
             context.perception = None
 
             # Inference on the frame, detecting persons and hands
-            results = pipeline.process_frame(frame, timestamp, frame_id)
+            results = pipeline.process_frame(frame, timestamp)
             
             context.perception = {
                 **results,
                 "timestamp": timestamp,
-                "frame_id": frame_id,
             }
 
             state = state.update(context)
@@ -63,10 +61,6 @@ def main():
                 break
 
             saver.write_frame_to_video(frame)
-
-            frame_id += 1
-
-
 
     except KeyboardInterrupt:
         print("Interrupted by user")
