@@ -1,6 +1,6 @@
 import mediapipe as mp
 import cv2
-from core.data_types import Hand
+from core.data_types import Hand, Person
 
 
 class HandDetector:
@@ -32,8 +32,10 @@ class HandDetector:
             # MediaPipe expects RGB images. OpenCV gives BGR.
             rgb_bbx = cv2.cvtColor(person_bbx, cv2.COLOR_BGR2RGB)
 
+            # Convert to Mediapipe image
             mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_bbx)
 
+            # Find hands
             results = self.recognizer.recognize(mp_image)
 
             # Length of hand_landmarks is the amount of hands in the image

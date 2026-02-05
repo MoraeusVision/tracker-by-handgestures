@@ -13,3 +13,10 @@ class Context:
         self.perception = None
 
         self.target_lost_time = None  # Tracks when the target was first lost
+
+        self.person_memory = {}
+
+    def reset_person_memory(self):
+        self.person_memory.clear()
+
+
