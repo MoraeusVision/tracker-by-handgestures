@@ -4,27 +4,38 @@ class StateBase:
     
 
 class Search(StateBase):
-    GESTURE_HOLD_SECONDS = 1.0
-    GESTURE_DECAY_SECONDS = 0.5
+    GESTURE_HOLD_SECONDS = 1.0 # Time for the hand to be shown until stopping
+    GESTURE_DECAY_SECONDS = 0.5 # Decay when hand is not showing
+    COOLDOWN_SECONDS = 3.0 # Cooldown until looking for hands
 
     def __init__(self):
         self.gesture_start_time = None
+        self.cooldown_start_time = None
         print("Searching...")
 
     def update(self, ctx):
         timestamp = ctx.perception["timestamp"]
 
-        list_of_hands = ctx.perception["hands"]
-        tracking_triggered, id_to_track = self.start_search_algorithm(
-            list_of_hands, timestamp
-        )
-        if tracking_triggered:
-            print("Target found!")
-            ctx.target_found = True
-            ctx.id_to_track = id_to_track
-            ctx.cooldown = True  # Cooldown before looking for hands again
+        if ctx.cooldown:
+            if self.cooldown_start_time is None:
+                self.cooldown_start_time = timestamp
 
-            return Track()
+            elapsed = timestamp - self.cooldown_start_time
+            if elapsed > self.COOLDOWN_SECONDS:
+                ctx.cooldown = False
+
+        if not ctx.cooldown:
+            list_of_hands = ctx.perception["hands"]
+            tracking_triggered, id_to_track = self.start_search_algorithm(
+                list_of_hands, timestamp
+            )
+            if tracking_triggered:
+                print("Target found!")
+                ctx.target_found = True
+                ctx.id_to_track = id_to_track
+                ctx.cooldown = True  # Cooldown before looking for hands again
+
+                return Track()
 
         return self
 
@@ -96,7 +107,7 @@ class Track(StateBase):
                 ctx.target_found = False
                 ctx.target_lost = True
                 ctx.target_lost_time = None  # Reset timer
-                return Stopped()
+                return Search()
 
             return self  # Stay in Track state during grace period
 
@@ -119,8 +130,9 @@ class Track(StateBase):
             if gesture_to_stop:
                 ctx.target_found = False
                 ctx.target_lost = True
+                ctx.cooldown = True
 
-                return Stopped()
+                return Search()
 
         return self
 
