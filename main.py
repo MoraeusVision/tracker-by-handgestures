@@ -14,6 +14,7 @@ import cv2
 def main():
     detector_cfg = load_detector_config("config/detector_config.yaml")
     what_to_detect = "both"
+    gesture = "Victory" # Options: Open_Palm, Closed_Fist, Pointing_Up, Thumbs_Down, Thumbs_Up, Victory, ILoveYou
 
     source = 0
     #source = "example_videos/example3.mp4"
@@ -53,7 +54,7 @@ def main():
                 "timestamp": timestamp,
             }
 
-            state = state.update(context)
+            state = state.update(context, gesture)
 
             visualization.write_on_frame.visualize_all(frame, results, context)
             cv2.imshow('Video stream', frame)

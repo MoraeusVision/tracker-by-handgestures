@@ -16,7 +16,7 @@ class Search(StateBase):
         self.cooldown_start_time = None
         print("Searching...")
 
-    def update(self, ctx):
+    def update(self, ctx, gesture="Open_Palm"):
         timestamp = ctx.perception["timestamp"]
 
         if ctx.cooldown:
@@ -30,7 +30,7 @@ class Search(StateBase):
         if not ctx.cooldown:
             list_of_hands = ctx.perception["hands"]
             tracking_triggered, id_to_track = self.start_search_algorithm(
-                list_of_hands, timestamp, ctx
+                list_of_hands, timestamp, ctx, gesture
             )
             if tracking_triggered:
                 print("Target found!")
@@ -44,13 +44,13 @@ class Search(StateBase):
 
     
 
-    def start_search_algorithm(self, hands, timestamp, ctx):
+    def start_search_algorithm(self, hands, timestamp, ctx, gesture):
         
         matched_ids = set()
 
         if hands:
             for hand in hands:
-                if hand.gesture_name == "Open_Palm":
+                if hand.gesture_name == gesture:
                                         
                     person_id = hand.owner_id
                     matched_ids.add(person_id)
@@ -95,7 +95,7 @@ class Track(StateBase):
         self.gesture_start_time = None
         self.cooldown_start_time = None
 
-    def update(self, ctx):
+    def update(self, ctx, gesture):
         timestamp = ctx.perception["timestamp"]
 
         id_to_track = ctx.id_to_track
@@ -133,7 +133,7 @@ class Track(StateBase):
 
         gesture_to_stop = False
         if not ctx.cooldown:
-            gesture_to_stop = self.search_for_gesture(ctx, timestamp)
+            gesture_to_stop = self.search_for_gesture(ctx, timestamp, gesture)
 
             if gesture_to_stop:
                 ctx.target_found = False
@@ -144,14 +144,14 @@ class Track(StateBase):
 
         return self
 
-    def search_for_gesture(self, ctx, timestamp):
+    def search_for_gesture(self, ctx, timestamp, gesture):
         matched_ids = set()
         list_of_hands = ctx.perception["hands"]
         if list_of_hands:
             for hand in list_of_hands:
                 if (
                     hand.owner_id == ctx.id_to_track
-                    and hand.gesture_name == "Open_Palm"
+                    and hand.gesture_name == gesture
                 ):
 
                     person_id = hand.owner_id
