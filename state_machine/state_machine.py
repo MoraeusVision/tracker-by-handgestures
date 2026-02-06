@@ -8,7 +8,7 @@ class StateBase:
 
 class Search(StateBase):
     GESTURE_HOLD_SECONDS = 1.0 # Time for the hand to be shown until stopping
-    GESTURE_DECAY_SECONDS = 0.1 # Decay when hand is not showing
+    GESTURE_DECAY_SECONDS = 0.3 # Decay when hand is not showing
     COOLDOWN_SECONDS = 3.0 # Cooldown until looking for hands
 
     def __init__(self):
@@ -87,7 +87,7 @@ class Search(StateBase):
 
 class Track(StateBase):
     GESTURE_HOLD_SECONDS = 1.0 # Time for the hand to be shown until stopping
-    GESTURE_DECAY_SECONDS = 0.1 # Decay when hand is not showing
+    GESTURE_DECAY_SECONDS = 0.3 # Decay when hand is not showing
     COOLDOWN_SECONDS = 3.0 # Cooldown until looking for hands
     GRACE_PERIOD_SECONDS = 1.0  # Grace period before transitioning to Stopped
 
