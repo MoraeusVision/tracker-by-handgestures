@@ -1,6 +1,6 @@
 import mediapipe as mp
 import cv2
-from core.data_types import Hand, Person
+from core.data_types import Hand
 
 
 class HandDetector:

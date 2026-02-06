@@ -3,6 +3,7 @@ import cv2
 
 ########## PERSON VISUALIZATION ##########
 
+
 def person_visualization(frame, results, ctx):
     bboxes = extract_bboxes(results)
     ids = extract_ids(results)
@@ -21,13 +22,7 @@ def person_visualization(frame, results, ctx):
         # Draw bbox + text
         cv2.rectangle(frame, (x1, y1), (x2, y2), color, 2)
         cv2.putText(
-            frame,
-            label,
-            (x1, y1 - 10),
-            cv2.FONT_HERSHEY_SIMPLEX,
-            0.6,
-            color,
-            2
+            frame, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 2
         )
 
         # Draw gesture progress bar
@@ -38,14 +33,15 @@ def person_visualization(frame, results, ctx):
             draw_progress_bar(frame, x1, y1, x2, y2, progress)
 
 
-
 def extract_bboxes(results):
-    bboxes = [p.bbox for p in results['persons']]
+    bboxes = [p.bbox for p in results["persons"]]
     return bboxes
 
+
 def extract_ids(results):
-    ids = [p.id for p in results['persons']]
+    ids = [p.id for p in results["persons"]]
     return ids
+
 
 def draw_progress_bar(frame, x1, y1, x2, y2, progress):
     bar_height = y2 - y1
@@ -68,9 +64,10 @@ def draw_progress_bar(frame, x1, y1, x2, y2, progress):
 
     # Border
     cv2.rectangle(frame, (bx1, by1), (bx2, by2), (255, 255, 255), 1)
-    
+
 
 ########## HAND VISUALIZATION ##########
+
 
 def hand_visualization(frame, results):
     pass
@@ -82,9 +79,7 @@ def extract_keypoints(frame, results):
 
 ########## VISUALIZE BOTH ##########
 
+
 def visualize_all(frame, results, ctx):
     person_visualization(frame, results, ctx)
     hand_visualization(frame, results)
-
-
-

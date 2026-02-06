@@ -18,5 +18,3 @@ class Context:
 
     def reset_person_memory(self):
         self.person_memory.clear()
-
-

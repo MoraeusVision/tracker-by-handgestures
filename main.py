@@ -10,14 +10,13 @@ import visualization.write_on_frame
 import cv2
 
 
-
 def main():
     detector_cfg = load_detector_config("config/detector_config.yaml")
     what_to_detect = "both"
-    gesture = "Victory" # Options: Open_Palm, Closed_Fist, Pointing_Up, Thumbs_Down, Thumbs_Up, Victory, ILoveYou
+    gesture = "Open_Palm"  # Options: Open_Palm, Closed_Fist, Pointing_Up, Thumbs_Down, Thumbs_Up, Victory, ILoveYou
 
     source = 0
-    #source = "example_videos/example3.mp4"
+    # source = "example_videos/example3.mp4"
 
     stream = VideoStream(source=source)
     saver = VideoSaver(resolution=stream.get_resolution())
@@ -35,20 +34,19 @@ def main():
         ),
     )
 
-
     try:
         state = Search()
         while True:
             frame, timestamp = stream.get_frame()
             if frame is None:
                 break
-            
+
             # Ensure states never observe stale perception.
             context.perception = None
 
             # Inference on the frame, detecting persons and hands
             results = pipeline.process_frame(frame, timestamp)
-            
+
             context.perception = {
                 **results,
                 "timestamp": timestamp,
@@ -57,8 +55,8 @@ def main():
             state = state.update(context, gesture)
 
             visualization.write_on_frame.visualize_all(frame, results, context)
-            cv2.imshow('Video stream', frame)
-            if cv2.waitKey(1) & 0xFF == ord('q'):
+            cv2.imshow("Video stream", frame)
+            if cv2.waitKey(1) & 0xFF == ord("q"):
                 break
 
             saver.write_frame_to_video(frame)

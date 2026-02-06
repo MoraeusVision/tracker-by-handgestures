@@ -1,15 +1,16 @@
 from core.data_types import PersonMemory
 from state_machine import utils
 
+
 class StateBase:
     def update(self, ctx):
         raise NotImplementedError
-    
+
 
 class Search(StateBase):
-    GESTURE_HOLD_SECONDS = 1.0 # Time for the hand to be shown until stopping
-    GESTURE_DECAY_SECONDS = 0.3 # Decay when hand is not showing
-    COOLDOWN_SECONDS = 3.0 # Cooldown until looking for hands
+    GESTURE_HOLD_SECONDS = 1.0  # Time for the hand to be shown until stopping
+    GESTURE_DECAY_SECONDS = 0.3  # Decay when hand is not showing
+    COOLDOWN_SECONDS = 3.0  # Cooldown until looking for hands
 
     def __init__(self):
         self.gesture_start_time = None
@@ -42,16 +43,14 @@ class Search(StateBase):
 
         return self
 
-    
-
     def start_search_algorithm(self, hands, timestamp, ctx, gesture):
-        
+
         matched_ids = set()
 
         if hands:
             for hand in hands:
                 if hand.gesture_name == gesture:
-                                        
+
                     person_id = hand.owner_id
                     matched_ids.add(person_id)
 
@@ -65,7 +64,9 @@ class Search(StateBase):
 
                     mem.gesture_elapsed_time = timestamp - mem.gesture_start_time
 
-                    print(f"ID {person_id} held for {round(mem.gesture_elapsed_time,2)} seconds")
+                    print(
+                        f"ID {person_id} held for {round(mem.gesture_elapsed_time,2)} seconds"
+                    )
 
                     # If gesture held enough time, return track ID and clear memory
                     if mem.gesture_elapsed_time >= self.GESTURE_HOLD_SECONDS:
@@ -73,22 +74,21 @@ class Search(StateBase):
                         ctx.reset_person_memory()
 
                         return True, id_to_track
-            
-        
-        utils.decay_all_memories(ctx=ctx,
-                                 timestamp=timestamp,
-                                 matched_ids=matched_ids,
-                                 gesture_decay_seconds=self.GESTURE_DECAY_SECONDS
-                                 )
+
+        utils.decay_all_memories(
+            ctx=ctx,
+            timestamp=timestamp,
+            matched_ids=matched_ids,
+            gesture_decay_seconds=self.GESTURE_DECAY_SECONDS,
+        )
 
         return False, None
-    
 
 
 class Track(StateBase):
-    GESTURE_HOLD_SECONDS = 1.0 # Time for the hand to be shown until stopping
-    GESTURE_DECAY_SECONDS = 0.3 # Decay when hand is not showing
-    COOLDOWN_SECONDS = 3.0 # Cooldown until looking for hands
+    GESTURE_HOLD_SECONDS = 1.0  # Time for the hand to be shown until stopping
+    GESTURE_DECAY_SECONDS = 0.3  # Decay when hand is not showing
+    COOLDOWN_SECONDS = 3.0  # Cooldown until looking for hands
     GRACE_PERIOD_SECONDS = 1.0  # Grace period before transitioning to Stopped
 
     def __init__(self):
@@ -110,7 +110,7 @@ class Track(StateBase):
                 ctx.target_lost_time = timestamp  # Start grace period timer
 
             elapsed = timestamp - ctx.target_lost_time
-            
+
             if elapsed >= self.GRACE_PERIOD_SECONDS:
                 ctx.target_found = False
                 ctx.target_lost = True
@@ -149,10 +149,7 @@ class Track(StateBase):
         list_of_hands = ctx.perception["hands"]
         if list_of_hands:
             for hand in list_of_hands:
-                if (
-                    hand.owner_id == ctx.id_to_track
-                    and hand.gesture_name == gesture
-                ):
+                if hand.owner_id == ctx.id_to_track and hand.gesture_name == gesture:
 
                     person_id = hand.owner_id
                     matched_ids.add(person_id)
@@ -167,16 +164,19 @@ class Track(StateBase):
 
                     mem.gesture_elapsed_time = timestamp - mem.gesture_start_time
 
-                    print(f"ID {person_id} held for {round(mem.gesture_elapsed_time,2)} seconds")
+                    print(
+                        f"ID {person_id} held for {round(mem.gesture_elapsed_time,2)} seconds"
+                    )
                     if mem.gesture_elapsed_time >= self.GESTURE_HOLD_SECONDS:
                         ctx.reset_person_memory()
                         return True
-                    
-        utils.decay_all_memories(ctx=ctx,
-                                 timestamp=timestamp,
-                                 matched_ids=matched_ids,
-                                 gesture_decay_seconds=self.GESTURE_DECAY_SECONDS
-                                 )  
+
+        utils.decay_all_memories(
+            ctx=ctx,
+            timestamp=timestamp,
+            matched_ids=matched_ids,
+            gesture_decay_seconds=self.GESTURE_DECAY_SECONDS,
+        )
 
         return False
 
@@ -184,7 +184,7 @@ class Track(StateBase):
 class Stopped(StateBase):
     def update(self, ctx):
         import time
-        
+
         print("Stopped! Searching in 3 seconds..")
 
         time.sleep(3)
