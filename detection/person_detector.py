@@ -1,12 +1,12 @@
 from core.data_types import Person
-
+import torch
 from ultralytics import YOLO
 
 
 class PersonDetector:
-    def __init__(self, model_path, device="cpu", conf=0.7):
+    def __init__(self, model_path, conf=0.7):
         self.model = YOLO(model_path)
-        self.device = device
+        self.device = select_device()
         self.conf = conf
 
     def detect(self, frame):
@@ -43,3 +43,15 @@ class PersonDetector:
                 persons.append(person)
 
         return persons
+    
+# Device selection
+def select_device():
+    if torch.backends.mps.is_available() and torch.backends.mps.is_built():
+        print("Using Apple Silicon GPU (MPS)")
+        return "mps"  # Apple GPU
+    elif torch.cuda.is_available():
+        print("Using NVIDIA GPU (CUDA)")
+        return "cuda"  # NVIDIA GPU
+    else:
+        print("Using CPU")
+        return "cpu"  # fallback

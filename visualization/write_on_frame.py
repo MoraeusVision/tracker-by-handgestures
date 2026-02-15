@@ -8,6 +8,16 @@ def person_visualization(frame, results, ctx):
     bboxes = extract_bboxes(results)
     ids = extract_ids(results)
 
+    if ctx.target_found:
+        # Only show the tracked person
+        tracked_indices = [i for i, pid in enumerate(ids) if pid == ctx.id_to_track]
+        if tracked_indices:
+            bboxes = [bboxes[i] for i in tracked_indices]
+            ids = [ids[i] for i in tracked_indices]
+        else:
+            bboxes = []
+            ids = []
+
     for (x1, y1, x2, y2), pid in zip(bboxes, ids):
         x1, y1, x2, y2 = map(int, (x1, y1, x2, y2))
 

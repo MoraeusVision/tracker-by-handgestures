@@ -1,7 +1,7 @@
 # Detector configs
 
 person_detector:
-  model_path: "models/yolo26n.pt"
+  model_path: "models/yolo26m.pt"
   conf: 0.7
 
 hand_detector:
